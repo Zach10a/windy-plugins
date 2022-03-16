@@ -7,45 +7,30 @@
 W.loadPlugin(
 /* Mounting options */
 {
-  "name": "windy-plugin-examples",
-  "version": "0.5.0",
-  "author": "Windyty, S.E.",
+  "name": "windy-plugin-aerodromecolourcode",
+  "version": "0.1.0",
+  "author": "Zach Tait",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/windycom/windy-plugins"
   },
-  "description": "Windy plugin system enables anyone, with basic knowledge of Javascript to enhance Windy with new functionality (default desc).",
-  "displayName": "Hello world",
+  "description": "Shows coloured icons on the map relating to that airfield's Colour State. Also, when clicked gives ",
+  "displayName": "Aerodrome Colour Code",
   "hook": "menu"
 },
 /* HTML */
-'',
+'<b>This plugin will rock</b>',
 /* CSS */
 '',
 /* Constructor */
 function () {
-  var map = W.require('map');
-
-  console.log('I am being mounted');
-  var popup = null;
+  console.log('I am mounted to the page');
 
   this.onopen = function () {
-    console.log('I am being opened');
-    var center = map.getCenter();
-
-    if (popup) {
-      popup.setLatLng(center);
-    } else {
-      popup = L.popup().setLatLng(center).setContent('Hello World').openOn(map);
-    }
+    return console.log('I am opened');
   };
 
   this.onclose = function () {
-    console.log('I am being closed');
-
-    if (popup) {
-      map.removeLayer(popup);
-      popup = null;
-    }
+    return console.log('I am being closed');
   };
 });
