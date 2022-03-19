@@ -1,11 +1,70 @@
 <plugin>
-    <b>This plugin will rock</b>
-
+    <!-- this Plugin does not have any HTML content -->
     <script>
-        console.log('I am mounted to the page');
+        // Windy API modules are imported via '@windy/nameOfModule'
+        import {map} from '@windy/map';
+        var xhttp = new XMLHttpRequest();
+        /*
+                    This part of code will be executed just once, since
+                    plugin remains 'mounted' in a page even after	closing
+                */
+        console.log('I am being mounted');
 
-        this.onopen = () => console.log('I am opened');
+        let popup = null;
 
-        this.onclose = () => console.log('I am being closed');
+        //	this.onopen method is called when your plugin is being opened
+        this.onopen = () => {
+            console.log('I am being opened');
+            const center = map.getCenter();
+            var icao = 'EGDM';
+
+            var icao_list = ["EGDM","EGYE","EGUB", "EGVN", "EGXC", "EGWC", "EGYD", "EGXE", "EGQS", "EGYM", "EGWU", "EGVO", "EGXP",
+            "EGOS", "EGSY", "EGOV", "EGXW","WOTG", "EGXT", "EGOW"];
+
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    console.log(xhttp.responseText);
+                    console.log(xhttp);
+                    let METAR_data = JSON.parse(xhttp.responseText);
+                    console.log(METAR_data["data"][0]);
+
+
+                }
+            };
+            {for i in icao_list:
+                var web_string = `https://api.checkwx.com/metar/${icao}/decoded`;
+                xhttp.open("GET", web_string, true);
+                xhttp.setRequestHeader('X-API-Key', '6b8ce0d9f2ee488a8e5f91ce58');
+                xhttp.send();
+                }
+
+            /*
+                this.ononpen method can be called repeatedly (without your plugin
+                being closed before), so make sure, that you will not to subscribe
+                to any listener twice
+            */
+            if (popup) {
+                popup.setLatLng(center);
+            } else {
+                popup = L.popup()
+                    .setLatLng(center)
+                    .setContent(METAR_data.data)
+                    .openOn(map);
+            }
+        };
+
+        /*
+            this.onclose method is called when your plugin is being closed
+
+            Unsubscribe from all your listeners, and remove all your
+            stuff from a map
+        */
+        this.onclose = () => {
+            console.log('I am being closed');
+            if (popup) {
+                map.removeLayer(popup);
+                popup = null;
+            }
+        };
     </script>
 </plugin>
