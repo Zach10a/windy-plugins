@@ -18,6 +18,7 @@
     "dependencies": {
         "@babel/core": "^7.1.2",
         "@babel/preset-env": "^7.1.0",
+        "axios": "^0.26.1",
         "chokidar": "^2.0.4",
         "colorette": "^1.0.6",
         "commander": "^2.19.0",
