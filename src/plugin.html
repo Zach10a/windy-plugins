@@ -16,27 +16,38 @@
         this.onopen = () => {
             console.log('I am being opened');
             const center = map.getCenter();
-            var icao = 'EGDM';
 
-            var icao_list = ["EGDM","EGYE","EGUB", "EGVN", "EGXC", "EGWC", "EGYD", "EGXE", "EGQS", "EGYM", "EGWU", "EGVO", "EGXP",
+            let icao_list = ["EGDM","EGYE","EGUB", "EGVN", "EGXC", "EGWC", "EGYD", "EGXE", "EGQS", "EGYM", "EGWU", "EGVO", "EGXP",
             "EGOS", "EGSY", "EGOV", "EGXW","WOTG", "EGXT", "EGOW"];
+            let icao_list_string = "";
+
+            for (let i = 0; i < icao_list.length - 1; i++) {
+                if (i < icao_list.length) {
+
+                icao_list_string += icao_list[i] + ",";
+                }
+                else {
+                    icao_list_string += icao_list[i];
+                }
+            }
 
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     console.log(xhttp.responseText);
-                    console.log(xhttp);
-                    let METAR_data = JSON.parse(xhttp.responseText);
-                    console.log(METAR_data["data"][0]);
 
+                    let METAR_data = JSON.parse(xhttp.responseText);
+                    console.log(METAR_data["data"][0][0]);
+                    console.log(icao_list_string);
+                    return METAR_data;
 
                 }
             };
-            {for i in icao_list:
-                var web_string = `https://api.checkwx.com/metar/${icao}/decoded`;
-                xhttp.open("GET", web_string, true);
-                xhttp.setRequestHeader('X-API-Key', '6b8ce0d9f2ee488a8e5f91ce58');
-                xhttp.send();
-                }
+            var web_string = `https://api.checkwx.com/metar/${icao_list_string}/decoded`;
+            xhttp.open("GET", web_string, true);
+            xhttp.setRequestHeader('X-API-Key', '6b8ce0d9f2ee488a8e5f91ce58');
+            xhttp.send();
+            let METAR_data = METAR_data;
+            console.log(icao_list_string);
 
             /*
                 this.ononpen method can be called repeatedly (without your plugin
@@ -48,7 +59,7 @@
             } else {
                 popup = L.popup()
                     .setLatLng(center)
-                    .setContent(METAR_data.data)
+                    .setContent(METAR_data["data"][0])
                     .openOn(map);
             }
         };
