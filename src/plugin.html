@@ -11,11 +11,26 @@
         console.log('I am being mounted');
 
         let popup = null;
+        let markerLayer = null;
 
         //	this.onopen method is called when your plugin is being opened
         this.onopen = () => {
             console.log('I am being opened');
             const center = map.getCenter();
+            const iconColours = ['BLU', 'WHT', 'GRE', 'YLO1', 'YLO2', 'AMB', 'RED']
+            let icons = []
+            createIcons = function() {
+                for (let i = 0; i < iconColours.length; i++) {
+                var Icon = L.icon({
+                    iconUrl: 'leaf-green.png';
+
+                    iconSize:     [38, 95], // size of the icon
+                    shadowSize:   [50, 64], // size of the shadow
+                    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+                    shadowAnchor: [4, 62],  // the same for the shadow
+                    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+                });
+            }
 
             let icao_list = ["EGDM","EGYE","EGUB", "EGVN", "EGXC", "EGWC", "EGYD", "EGXE", "EGQS", "EGYM", "EGWU", "EGVO", "EGXP",
             "EGOS", "EGSY", "EGOV", "EGXW","WOTG", "EGXT", "EGOW"];
@@ -33,10 +48,10 @@
 
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
-                    console.log(xhttp.responseText);
+                    // console.log(xhttp.responseText);
 
                     let METAR_data = JSON.parse(xhttp.responseText);
-                    console.log(METAR_data["data"][0][0]);
+                    // console.log(METAR_data["data"][0][0]);
                     console.log(icao_list_string);
                     return METAR_data;
 
@@ -46,8 +61,8 @@
             xhttp.open("GET", web_string, true);
             xhttp.setRequestHeader('X-API-Key', '6b8ce0d9f2ee488a8e5f91ce58');
             xhttp.send();
-            let METAR_data = METAR_data;
-            console.log(icao_list_string);
+            let METAR_data = xhttp.responseText;
+
 
             /*
                 this.ononpen method can be called repeatedly (without your plugin
@@ -57,10 +72,15 @@
             if (popup) {
                 popup.setLatLng(center);
             } else {
-                popup = L.popup()
+
+                for (markerLayer = L.marker()
                     .setLatLng(center)
-                    .setContent(METAR_data["data"][0])
-                    .openOn(map);
+                    .addTo(map)
+                    .bindPopup("`${METAR_data['data'][0][0]}`")
+                    .openPopup();
+
+                console.log(METAR_data['data'][0][0]);
+                console.log(icao_list_string);
             }
         };
 
