@@ -2,46 +2,63 @@
     <!-- this Plugin does not have any HTML content -->
     <script>
         // Windy API modules are imported via '@windy/nameOfModule'
-        import {map} from '@windy/map';
+        import { map } from "@windy/map";
+
         var xhttp = new XMLHttpRequest();
+
         /*
                     This part of code will be executed just once, since
                     plugin remains 'mounted' in a page even after	closing
                 */
-        console.log('I am being mounted');
+        console.log("I am being mounted");
 
-        let popup = null;
+        let marker = null;
         let markerLayer = null;
 
         //	this.onopen method is called when your plugin is being opened
         this.onopen = () => {
-            console.log('I am being opened');
+            console.log("I am being opened");
             const center = map.getCenter();
-            const iconColours = ['BLU', 'WHT', 'GRE', 'YLO1', 'YLO2', 'AMB', 'RED']
-            let icons = []
-            createIcons = function() {
-                for (let i = 0; i < iconColours.length; i++) {
-                var Icon = L.icon({
-                    iconUrl: 'leaf-green.png';
+            const iconColours = {
+                "BLU": "rgb(0, 0, 255)",
+                "WHT": "rgb(255, 255, 255)",
+                "GRE": "rgb(0, 128, 0)",
+                "YLO1": "rgb(255, 255, 0)",
+                "YLO2": "rgb(255, 255, 0)",
+                "AMB": "rgb(255, 140, 0)",
+                "RED": "rgb(255, 0, 0)",
+                "BLK": "rgb(0, 0, 0)"
+            };
+            let icons = {};
 
-                    iconSize:     [38, 95], // size of the icon
-                    shadowSize:   [50, 64], // size of the shadow
-                    iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
-                    shadowAnchor: [4, 62],  // the same for the shadow
-                    popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
-                });
+            function createIcons() {
+                for (var key in iconColours) {
+                    let iconColour = iconColours[key];
+                    let AirfieldString = `<svg width="20" height="20">
+                        <rect width="20" height="20" style="fill:${iconColour};stroke-width:3;stroke:rgb(0,0,0)" />
+                        </svg>`;
+                    let AirfieldIcon;
+                    AirfieldIcon = L.divIcon({
+                        html: `${AirfieldString}`,
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+                    icons[`${key}`] = AirfieldIcon;
+                }
+                return icons;
             }
 
-            let icao_list = ["EGDM","EGYE","EGUB", "EGVN", "EGXC", "EGWC", "EGYD", "EGXE", "EGQS", "EGYM", "EGWU", "EGVO", "EGXP",
-            "EGOS", "EGSY", "EGOV", "EGXW","WOTG", "EGXT", "EGOW"];
+            let AirfieldIcons = createIcons();
+            console.log(AirfieldIcons);
+            let icao_list = ["EGDM", "EGYE", "EGUB", "EGVN", "EGXC", "EGWC", "EGYD", "EGXE", "EGQS", "EGYM", "EGWU", "EGVO", "EGXP",
+                "EGOS", "EGSY", "EGOV", "EGXW", "WOTG", "EGXT", "EGOW"];
             let icao_list_string = "";
 
             for (let i = 0; i < icao_list.length - 1; i++) {
                 if (i < icao_list.length) {
 
-                icao_list_string += icao_list[i] + ",";
-                }
-                else {
+                    icao_list_string += icao_list[i] + ",";
+                } else {
                     icao_list_string += icao_list[i];
                 }
             }
@@ -59,7 +76,7 @@
             };
             var web_string = `https://api.checkwx.com/metar/${icao_list_string}/decoded`;
             xhttp.open("GET", web_string, true);
-            xhttp.setRequestHeader('X-API-Key', '6b8ce0d9f2ee488a8e5f91ce58');
+            xhttp.setRequestHeader("X-API-Key", "6b8ce0d9f2ee488a8e5f91ce58");
             xhttp.send();
             let METAR_data = xhttp.responseText;
 
@@ -69,33 +86,34 @@
                 being closed before), so make sure, that you will not to subscribe
                 to any listener twice
             */
-            if (popup) {
-                popup.setLatLng(center);
-            } else {
+            if (marker) {
+                marker = null;
+            }
 
-                for (markerLayer = L.marker()
-                    .setLatLng(center)
+
+            for (var key in icons) {
+                L.marker(center, { icon: AirfieldIcons["GRE"] })
+
+                    // .setLatLng(center)
                     .addTo(map)
                     .bindPopup("`${METAR_data['data'][0][0]}`")
                     .openPopup();
+            };
 
-                console.log(METAR_data['data'][0][0]);
-                console.log(icao_list_string);
-            }
-        };
 
-        /*
-            this.onclose method is called when your plugin is being closed
 
-            Unsubscribe from all your listeners, and remove all your
-            stuff from a map
-        */
-        this.onclose = () => {
-            console.log('I am being closed');
-            if (popup) {
-                map.removeLayer(popup);
-                popup = null;
-            }
-        };
+            /*
+                this.onclose method is called when your plugin is being closed
+
+                Unsubscribe from all your listeners, and remove all your
+                stuff from a map
+            */
+            this.onclose = () => {
+                console.log("I am being closed");
+                if (popup) {
+                    map.removeLayer(popup);
+                    popup = null;
+                }
+            };
     </script>
 </plugin>
