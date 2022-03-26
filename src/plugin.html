@@ -13,7 +13,7 @@
         console.log("I am being mounted");
 
         let marker = null;
-        let markerLayer = null;
+        let layer = null;
 
         //	this.onopen method is called when your plugin is being opened
         this.onopen = () => {
@@ -51,7 +51,7 @@
             let AirfieldIcons = createIcons();
             console.log(AirfieldIcons);
             let icao_list = ["EGDM", "EGYE", "EGUB", "EGVN", "EGXC", "EGWC", "EGYD", "EGXE", "EGQS", "EGYM", "EGWU", "EGVO", "EGXP",
-                "EGOS", "EGSY", "EGOV", "EGXW", "WOTG", "EGXT", "EGOW"];
+                "EGOS", "EGSY", "EGOV", "EGXW", "WOTG", "EGXT", "EGOW", "EGHF"];
             let icao_list_string = "";
 
             for (let i = 0; i < icao_list.length - 1; i++) {
@@ -86,20 +86,18 @@
                 being closed before), so make sure, that you will not to subscribe
                 to any listener twice
             */
-            if (marker) {
-                marker = null;
-            }
+
+            marker = null;
 
 
-            for (var key in icons) {
-                L.marker(center, { icon: AirfieldIcons["GRE"] })
+            for (var key in AirfieldIcons) {
+                L.marker(center, { icon: AirfieldIcons[key] })
 
                     // .setLatLng(center)
                     .addTo(map)
-                    .bindPopup("`${METAR_data['data'][0][0]}`")
+                    .bindPopup(`${METAR_data['data'][0][0]}`)
                     .openPopup();
-            };
-
+            }
 
 
             /*
@@ -110,10 +108,11 @@
             */
             this.onclose = () => {
                 console.log("I am being closed");
-                if (popup) {
-                    map.removeLayer(popup);
-                    popup = null;
+                if (marker) {
+                    map.removeLayer(layer);
+                    marker = null;
                 }
             };
+        };
     </script>
 </plugin>
